@@ -19,6 +19,9 @@ jobs:
 
       - run: npm install --legacy-peer-deps
 
+      - name: Fix duplicate permalink
+        run: rm -f "docs/15.技术实战/03.技巧备忘/13.Yaml语言教程.md"
+
       - run: npm run build
 
       - name: Deploy to gh-pages
