@@ -15,12 +15,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 14
 
       - run: npm install --legacy-peer-deps
-
-      - name: Fix duplicate permalink
-        run: rm -f "docs/15.技术实战/03.技巧备忘/13.Yaml语言教程.md"
 
       - run: npm run build
 
