@@ -23,27 +23,17 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install
-        run: |
-          yarn install
-          echo "=== node-version ==="
-          node --version
-
       - name: Build
         run: |
-          yarn build
-          echo "=== dist contents ==="
-          ls -la docs/.vuepress/dist/ 2>&1 || echo "DIST NOT FOUND"
+          npm install
+          npm run build
+          echo "=== dist ==="
+          ls docs/.vuepress/dist/ | head -20
 
       - name: Deploy
         run: |
-          if [ ! -d "docs/.vuepress/dist" ]; then
-            echo "ERROR: dist directory does not exist"
-            exit 1
-          fi
           cd docs/.vuepress/dist
           touch .nojekyll
-          cp ../../index.html . 2>/dev/null || true
           git init
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
