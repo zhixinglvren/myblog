@@ -7,36 +7,34 @@ on:
 permissions:
   contents: write
 
-env:
-  TZ: Asia/Shanghai
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 16
 
-      - name: Build
-        run: |
-          npm install
-          npm run build
-          echo "=== dist ==="
-          ls docs/.vuepress/dist/ | head -20
+      - run: |
+          echo "--- Node version ---"
+          node --version
+          echo "--- Dir ---"
+          ls docs/
 
-      - name: Deploy
-        run: |
-          cd docs/.vuepress/dist
-          touch .nojekyll
-          git init
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add -A
-          git commit -m "deploy"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
+      - run: npm install
+
+      - run: npm run build --verbose
+        continue-on-error: true
+
+      - run: |
+          echo "=== dist check ==="
+          if [ -d "docs/.vuepress/dist" ]; then
+            echo "DIST EXISTS"
+            ls docs/.vuepress/dist/ | head -20
+          else
+            echo "DIST NOT FOUND"
+            echo "Checking vuepress dir..."
+            ls -la docs/.vuepress/ 2>/dev/null || echo "No .vuepress"
+          fi
