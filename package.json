@@ -29,8 +29,11 @@
     "yamljs": "^0.3.0"
   },
   "dependencies": {
+    "@vue/component-compiler-utils": "^3.3.0",
     "@vuepress/shared-utils": "^1.9.10",
     "lru-cache": "^6.0.0",
-    "markdown-it-emoji": "^1.4.0"
+    "markdown-it-emoji": "^1.4.0",
+    "vue-template-compiler": "^2.7.16",
+    "webpack": "^5.107.2"
   }
 }
