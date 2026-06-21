@@ -19,3 +19,4 @@ urls.txt
 
 # mac
 .DS_Store
+node_modules_old\  

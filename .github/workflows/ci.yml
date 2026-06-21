@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 jobs:
   build-and-deploy:
@@ -18,26 +17,17 @@ jobs:
         with:
           node-version: 16
 
-      - run: npm install
+      - run: npm install --legacy-peer-deps
 
-      - name: Build
-        id: build
-        run: npm run build 2>&1 | tee build.log
-        continue-on-error: true
+      - run: npm run build
 
-      - name: Upload build log
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.log
-
-      - name: Check dist
+      - name: Deploy to gh-pages
         run: |
-          if [ -d "docs/.vuepress/dist/index.html" ]; then
-            echo "Build succeeded"
-          elif [ -d "docs/.vuepress/dist" ]; then
-            echo "Dist exists but no index.html"
-            ls -la docs/.vuepress/dist/
-          else
-            echo "Dist not found"
-          fi
+          cd docs/.vuepress/dist
+          touch .nojekyll
+          git init
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "deploy"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages

@@ -29,6 +29,8 @@
     "yamljs": "^0.3.0"
   },
   "dependencies": {
-    "@vuepress/shared-utils": "^1.9.10"
+    "@vuepress/shared-utils": "^1.9.10",
+    "lru-cache": "^6.0.0",
+    "markdown-it-emoji": "^1.4.0"
   }
 }
