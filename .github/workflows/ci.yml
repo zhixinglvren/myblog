@@ -1,44 +1,40 @@
-name: CI
+name: Deploy
 
-on: [push]
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
 
 env:
   TZ: Asia/Shanghai
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16
 
-      - name: Build and deploy
+      - name: Build
         run: |
-          remote_addr=`git remote get-url --push origin`
-          commit_info=`git describe --all --always --long`
-          user_name=`git log -1 --pretty=format:'%an'`
-          user_email=`git log -1 --pretty=format:'%ae'`
-          deploy_branch=gh-pages
-          yarn
+          yarn install --frozen-lockfile
           yarn build
+
+      - name: Deploy to gh-pages
+        run: |
           cd docs/.vuepress/dist
-          git config --global init.defaultBranch $deploy_branch
+          touch .nojekyll
           git init
-          git config user.name ${user_name}
-          git config user.email ${user_email}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "auto deploy, $commit_info"
-          remote_addr=`echo $remote_addr | awk -F'://' '{print $2}'`
-          remote_addr=https://${user_name}:${{secrets.GITHUB_TOKEN}}@${remote_addr}
-          git remote add origin ${remote_addr}
-          git push origin HEAD:$deploy_branch --force
+          git commit -m "deploy: ${{ github.sha }}"
+          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
