@@ -27,16 +27,14 @@ jobs:
         run: |
           yarn install
           yarn build
-          echo "Build done, contents of dist:"
-          ls -la docs/.vuepress/dist/
-          echo "Has index.html?"
-          test -f docs/.vuepress/dist/index.html && echo "YES" || echo "NO"
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/.vuepress/dist
-          publish_branch: gh-pages
-          force_orphan: true
-          enable_jekyll: false
+      - name: Deploy to gh-pages
+        run: |
+          cd docs/.vuepress/dist
+          touch .nojekyll
+          git init
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "deploy"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
